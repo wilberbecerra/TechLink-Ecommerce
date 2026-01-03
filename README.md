@@ -18,4 +18,29 @@
 * **Panel de Administración:** Gestión de inventario (CRUD) y control de órdenes de compra.
 * **Diseño Responsivo:** Interfaz adaptada para diferentes dispositivos.
 
+## ✨ Página Principal
+![Image_Alt](https://github.com/wilberbecerra/TechLink-Ecommerce/blob/35fc7f6374f383cb9f2acdcff9b7484721037708/recursos/pagina-principal.jpg)
 
+## ✨ Login
+![Image_Alt](https://github.com/wilberbecerra/TechLink-Ecommerce/blob/35fc7f6374f383cb9f2acdcff9b7484721037708/recursos/login.jpg)
+
+## ✨ Lista de Productos
+![Image_Alt](https://github.com/wilberbecerra/TechLink-Ecommerce/blob/35fc7f6374f383cb9f2acdcff9b7484721037708/recursos/lista-productos.jpg)
+
+## ✨ Crear Producto
+![Image_Alt](https://github.com/wilberbecerra/TechLink-Ecommerce/blob/35fc7f6374f383cb9f2acdcff9b7484721037708/recursos/create-productos.jpg)
+
+## ✨ Editar Producto
+![Image_Alt](https://github.com/wilberbecerra/TechLink-Ecommerce/blob/35fc7f6374f383cb9f2acdcff9b7484721037708/recursos/edit-productos.jpg)
+
+## ✨ Lista de Usuarios
+![Image_Alt](https://github.com/wilberbecerra/TechLink-Ecommerce/blob/35fc7f6374f383cb9f2acdcff9b7484721037708/recursos/lista-usuarios.jpg)
+
+## ✨ Lista de Ordenes
+![Image_Alt](https://github.com/wilberbecerra/TechLink-Ecommerce/blob/35fc7f6374f383cb9f2acdcff9b7484721037708/recursos/lista-ordenes.jpg)
+
+## ✨ Detalle de Orden 
+![Image_Alt](https://github.com/wilberbecerra/TechLink-Ecommerce/blob/35fc7f6374f383cb9f2acdcff9b7484721037708/recursos/detalles.jpg)
+
+## ✨ Reporte de Orden 
+![Image_Alt](https://github.com/wilberbecerra/TechLink-Ecommerce/blob/35fc7f6374f383cb9f2acdcff9b7484721037708/recursos/orden-pdf.jpg)
