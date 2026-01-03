@@ -3,6 +3,24 @@
  * Copyright 2013-2020 Start Bootstrap
  * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-heroic-features/blob/master/LICENSE)
  */
+
 body {
-  padding-top: 56px;
+  padding-top: 56px;       /* IMPORTANTE: Para que el menú no tape el contenido */
+  min-height: 100vh;       /* Altura mínima del 100% de la ventana */
+  display: flex;           /* Activamos Flexbox en el cuerpo */
+  flex-direction: column;  /* Ordenamos verticalmente */
+}
+
+body > .container {
+  display: flex;           /* <--- ESTO FALTABA: Activamos Flexbox en el contenedor */
+  flex-direction: column;  /* Ordenamos sus hijos verticalmente */
+  flex: 1;                 /* El contenedor ocupa todo el espacio libre entre header y footer */
+}
+
+.jumbotron {
+  flex-grow: 1;            /* El jumbotron crece para llenar el hueco del container */
+  margin-bottom: 0 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }

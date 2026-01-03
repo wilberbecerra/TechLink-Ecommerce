@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Compra Exitosa | TechLink</title>
+    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+
+<div class="container text-center mt-5">
+    <div class="jumbotron">
+        <h1 class="display-4 text-success">¡Gracias por tu compra!</h1>
+        <p class="lead">Tu orden ha sido procesada correctamente.</p>
+        <hr class="my-4">
+        <p>Puedes descargar el detalle de tu compra aquí:</p>
+
+        <a th:href="@{/pdf/{id} (id=${idOrden}) }" class="btn btn-primary btn-lg" target="_blank">
+            Descargar Comprobante PDF
+        </a>
+
+        <br><br>
+        <a th:href="@{/}" class="btn btn-secondary">Volver al Inicio</a>
+    </div>
+</div>
+
+</body>
+</html>

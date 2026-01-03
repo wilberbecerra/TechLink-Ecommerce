@@ -1,14 +1,13 @@
 package com.proyecto.ecommerce.model;
 
 import jakarta.persistence.*;
-
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "ordenes")
-
 public class Orden {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -20,10 +19,12 @@ public class Orden {
     @ManyToOne
     private Usuario usuario;
 
+    // Relación uno a muchos con DetalleOrden
+    // 'mappedBy' debe coincidir con el nombre del atributo 'orden' en la clase DetalleOrden
     @OneToMany(mappedBy = "orden")
-    private List<DetalleOrden> detalle;
+    private List<DetalleOrden> detalles;
 
-    public Orden(){
+    public Orden() {
         // Constructor vacío
     }
 
@@ -35,6 +36,8 @@ public class Orden {
         this.fechaRecibida = fechaRecibida;
         this.total = total;
     }
+
+    // Getters y Setters
 
     public Integer getId() {
         return id;
@@ -84,12 +87,13 @@ public class Orden {
         this.usuario = usuario;
     }
 
-    public List<DetalleOrden> getDetalle() {
-        return detalle;
+    // --- GETTER Y SETTER PARA LA LISTA (Crucial para el PDF) ---
+    public List<DetalleOrden> getDetalles() {
+        return detalles;
     }
 
-    public void setDetalle(List<DetalleOrden> detalle) {
-        this.detalle = detalle;
+    public void setDetalles(List<DetalleOrden> detalles) {
+        this.detalles = detalles;
     }
 
     @Override

@@ -96,7 +96,7 @@ public class UsuarioController {
         logger.info("Id de la orden: {}", id);
         Optional<Orden> orden=ordenService.findById(id);
 
-        model.addAttribute("detalles", orden.get().getDetalle());
+        model.addAttribute("detalles", orden.get().getDetalles());
 
 
         //session

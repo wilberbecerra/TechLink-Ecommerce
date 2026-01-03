@@ -1,6 +1,5 @@
 package com.proyecto.ecommerce.controller;
 
-
 import com.proyecto.ecommerce.model.Orden;
 import com.proyecto.ecommerce.model.Producto;
 import com.proyecto.ecommerce.service.IOrdenService;
@@ -30,9 +29,7 @@ public class AdministradoController {
     @Autowired
     private IOrdenService ordenService;
 
-
     private Logger logg = LoggerFactory.getLogger(AdministradoController.class);
-
 
     @GetMapping("")
     public String home(Model model) {
@@ -60,7 +57,9 @@ public class AdministradoController {
         logg.info("Id de la orden {} ", id);
         Orden orden = ordenService.findById(id).get();
 
-        model.addAttribute("detalles", orden.getDetalle());
+        // --- CORRECCIÓN ---
+        // Se cambió orden.getDetalle() por orden.getDetalles() (plural)
+        model.addAttribute("detalles", orden.getDetalles());
 
         return "administrador/detalleorden";
     }
