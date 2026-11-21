@@ -36,7 +36,7 @@ También se separó el carrito por sesión, se protegieron las operaciones con C
 
 ## Galería
 
-Capturas de la aplicación ejecutada con datos de demostración. Haz clic para verlas completas.
+Capturas del rediseño actual, tomadas de la aplicación ejecutada con datos de demostración. Haz clic para verlas completas.
 
 | Tienda | Administración |
 | --- | --- |
@@ -46,7 +46,24 @@ Capturas de la aplicación ejecutada con datos de demostración. Haz clic para v
 | --- | --- |
 | [![Acceso a TechLink](recursos/redesign/login-desktop.png)](recursos/redesign/login-desktop.png) | [Vista completa de la tienda en móvil](recursos/redesign/tienda-movil.png) |
 
-La [guía de capturas](docs/capturas.md) reúne los enlaces de cada pantalla, los roles necesarios y la preparación del carrito y las órdenes. Las capturas originales permanecen en `recursos/` como referencia histórica.
+<details>
+<summary>Ver productos, usuarios y órdenes</summary>
+
+| Inventario | Crear producto |
+| --- | --- |
+| [![Inventario actual](recursos/redesign/productos-desktop.png)](recursos/redesign/productos-desktop.png) | [![Crear producto](recursos/redesign/crear-producto-desktop.png)](recursos/redesign/crear-producto-desktop.png) |
+
+| Editar producto | Usuarios |
+| --- | --- |
+| [![Editar producto](recursos/redesign/editar-producto-desktop.png)](recursos/redesign/editar-producto-desktop.png) | [![Usuarios](recursos/redesign/usuarios-desktop.png)](recursos/redesign/usuarios-desktop.png) |
+
+| Órdenes | Detalle de orden |
+| --- | --- |
+| [![Órdenes](recursos/redesign/ordenes-desktop.png)](recursos/redesign/ordenes-desktop.png) | [![Detalle de orden](recursos/redesign/detalle-orden-desktop.png)](recursos/redesign/detalle-orden-desktop.png) |
+
+</details>
+
+La [guía de capturas](docs/capturas.md) reúne los enlaces de cada pantalla, los roles necesarios y la preparación del carrito y las órdenes. Todas las imágenes publicadas en esta galería pertenecen al rediseño y están en `recursos/redesign/`.
 
 ## Funcionalidades
 

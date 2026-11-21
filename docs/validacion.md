@@ -18,7 +18,7 @@ Se verificaron búsqueda sin resultados, filtro por categoría, ordenamiento de 
 
 El navegador no confirmó compras adicionales: la operación de compra y su efecto sobre el stock se probaron en la base temporal de las pruebas automatizadas. Las comprobaciones de navegador son funcionales y visuales; no equivalen a una auditoría completa de accesibilidad ni a pruebas de todos los navegadores.
 
-Las capturas conservadas en `recursos/redesign/` corresponden a la aplicación ejecutada, no a maquetas. Hay una portada de escritorio, portada móvil, acceso y administración. El reporte completo y las demás capturas de revisión están en `target/visual-review/`, que Git ignora.
+Las capturas conservadas en `recursos/redesign/` corresponden a la aplicación ejecutada, no a maquetas. Incluyen portada de escritorio y móvil, acceso, administración, inventario, creación y edición de productos, usuarios, órdenes y detalle de orden. El reporte completo y las demás capturas de revisión están en `target/visual-review/`, que Git ignora.
 
 ## Alcance de Hallmark
 

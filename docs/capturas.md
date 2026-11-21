@@ -10,23 +10,24 @@ Los accesos de administrador y cliente se consultan únicamente en `.local/demo-
 
 Ambas ingresan desde [Iniciar sesión](http://localhost:8080/usuario/login). Para cambiar de cuenta, abre el nombre de usuario en el encabezado y pulsa **Cerrar sesión**. También puedes usar dos perfiles de navegador.
 
-## Capturas del README original
+## Capturas actuales del README
 
 Las rutas se conservaron. Los IDs de ejemplo corresponden a la carga inicial de una base vacía; si tu base ya tiene información, entra mediante los botones de la aplicación para obtener los IDs correctos.
 
-| Captura / archivo en `recursos/` | Enlace | Preparación |
+| Captura / archivo en `recursos/redesign/` | Enlace | Preparación |
 | --- | --- | --- |
-| Página principal / `pagina-principal.jpg` | [Vista general](http://localhost:8080/administrador) | Ingresar como administrador. Esta es la ruta visible en la captura original. |
-| Login / `login.jpg` | [Ingresar](http://localhost:8080/usuario/login) | Cerrar sesión. No mostrar contraseñas en la captura. |
-| Lista de productos / `lista-productos.jpg` | [Inventario](http://localhost:8080/productos) | Administrador. |
-| Crear producto / `create-productos.jpg` | [Nuevo producto](http://localhost:8080/productos/create) | Administrador. No hace falta guardar. |
-| Editar producto / `edit-productos.jpg` | [Editar producto 1](http://localhost:8080/productos/edit/1) | Administrador. No hace falta modificarlo. |
-| Lista de usuarios / `lista-usuarios.jpg` | [Usuarios](http://localhost:8080/administrador/usuarios) | Administrador. |
-| Lista de órdenes / `lista-ordenes.jpg` | [Órdenes](http://localhost:8080/administrador/ordenes) | Administrador. La demo incluye una compra. |
-| Detalle de orden / `detalles.jpg` | [Orden 1](http://localhost:8080/administrador/detalle/1) | Administrador. La captura antigua mostraba el ID 2, que depende de cada base. |
-| Reporte de orden / `orden-pdf.jpg` | [Comprobante 1](http://localhost:8080/pdf/1) | Administrador o cliente dueño de la orden. Abre el PDF en el navegador. |
+| Tienda / `tienda-desktop.png` | [Inicio](http://localhost:8080/) | Sin sesión o como cliente. |
+| Tienda móvil / `tienda-movil.png` | [Inicio](http://localhost:8080/) | Usar el tamaño de pantalla móvil. |
+| Administración / `admin-desktop.png` | [Vista general](http://localhost:8080/administrador) | Ingresar como administrador. |
+| Login / `login-desktop.png` | [Ingresar](http://localhost:8080/usuario/login) | Cerrar sesión. No mostrar contraseñas en la captura. |
+| Lista de productos / `productos-desktop.png` | [Inventario](http://localhost:8080/productos) | Administrador. |
+| Crear producto / `crear-producto-desktop.png` | [Nuevo producto](http://localhost:8080/productos/create) | Administrador. No hace falta guardar. |
+| Editar producto / `editar-producto-desktop.png` | [Editar producto 1](http://localhost:8080/productos/edit/1) | Administrador. No hace falta modificarlo. |
+| Lista de usuarios / `usuarios-desktop.png` | [Usuarios](http://localhost:8080/administrador/usuarios) | Administrador. |
+| Lista de órdenes / `ordenes-desktop.png` | [Órdenes](http://localhost:8080/administrador/ordenes) | Administrador. La demo incluye una compra. |
+| Detalle de orden / `detalle-orden-desktop.png` | [Orden 1](http://localhost:8080/administrador/detalle/1) | Administrador. |
 
-`reporte-orden.jpg` es otro archivo histórico presente en el repositorio. Si lo usas, reemplázalo con la captura del mismo comprobante.
+Para fotografiar el reporte vigente, abre [Comprobante 1](http://localhost:8080/pdf/1) como administrador o cliente dueño de la orden. El PDF se genera desde la aplicación actual.
 
 ## Capturas adicionales de la tienda renovada
 
@@ -44,4 +45,4 @@ Las rutas se conservaron. Los IDs de ejemplo corresponden a la carga inicial de 
 
 Para un recorrido completo: cliente → catálogo → detalle → agregar al carrito → continuar compra → confirmar → comprobante PDF. Confirmar guarda una orden y descuenta stock; usa la orden demo para fotografiar sin generar compras adicionales.
 
-Se recomienda 1440 × 1000 para escritorio y 390 × 844 para móvil, zoom 100 %. Para la portada, utiliza captura de página completa si quieres incluir el catálogo. Mantén el tamaño de ventana entre capturas y cierra el menú de cuenta antes de fotografiar. Las imágenes históricas se conservan hasta que las reemplaces. El README usa rutas relativas para que aparezcan las capturas nuevas al actualizar los archivos.
+Se recomienda 1440 × 1000 para escritorio y 390 × 844 para móvil, zoom 100 %. Para la portada, utiliza captura de página completa si quieres incluir el catálogo. Mantén el tamaño de ventana entre capturas y cierra el menú de cuenta antes de fotografiar. Actualiza los archivos de `recursos/redesign/` al renovar las capturas; el README usa rutas relativas a esa carpeta.
