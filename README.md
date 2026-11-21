@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="src/main/resources/static/brand/techlink.svg" alt="TechLink" width="250">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/main/resources/static/brand/techlink-white.svg">
+    <source media="(prefers-color-scheme: light)" srcset="src/main/resources/static/brand/techlink.svg">
+    <img src="src/main/resources/static/brand/techlink.svg" alt="TechLink" width="250">
+  </picture>
 </p>
 
 <h1 align="center">Tecnología que va contigo</h1>
@@ -180,7 +184,7 @@ El rediseño se comprobó con **9 pruebas automatizadas** y **45 comprobaciones 
 
 - [Identidad visual y decisiones de interfaz](docs/design.md).
 - [Rutas y preparación de capturas](docs/capturas.md).
-- [Logo SVG editable](src/main/resources/static/brand/techlink.svg) y [símbolo independiente](src/main/resources/static/brand/mark.svg).
+- [Logo SVG editable](src/main/resources/static/brand/techlink.svg), [versión con letras blancas](src/main/resources/static/brand/techlink-white.svg) y [símbolo independiente](src/main/resources/static/brand/mark.svg).
 - [Skill TechLink Design](skills/techlink-design/SKILL.md), adaptada de [Hallmark](https://github.com/Nutlope/hallmark), con su licencia MIT conservada.
 
 ## Alcance académico

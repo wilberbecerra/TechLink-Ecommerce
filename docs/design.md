@@ -4,6 +4,8 @@ Propuesta inicial del 21 de noviembre de 2026, abierta a los archivos de referen
 
 La idea es conectar las piezas del espacio personal: computadora, consola, audio y accesorios. El símbolo del logo une dos eslabones; el nombre aparece en minúsculas con un punto cobalto. Los archivos editables están en `src/main/resources/static/brand/techlink.svg` y `mark.svg`.
 
+La variante `src/main/resources/static/brand/techlink-white.svg` utiliza letras blancas y conserva el símbolo y el punto cobalto. El README selecciona esta variante en modo oscuro mediante `<picture>` y mantiene las letras oscuras para el modo claro.
+
 El catálogo se apoya en superficies claras, texto oscuro, azul cobalto y fotografías existentes. El precio y la disponibilidad acompañan a cada producto. Se evita inventar descuentos, estrellas, testimonios, garantía o condiciones de envío.
 
 | Rol | Valor |
