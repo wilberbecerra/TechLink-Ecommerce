@@ -1,68 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Spring eCommerce</title>
-
-
-    <!-- Bootstrap core CSS -->
-    <link th:href="@{vendor/bootstrap/css/bootstrap.min.css}"
-          rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link th:href="@{css/heroic-features.css}" rel="stylesheet">
-
-</head>
-
-<body>
-
-<!-- Navigation -->
-<div th:include="administrador/template_admin.html::header"></div>
-
-<!-- Page Content -->
-<div class="container">
-
-    <!-- Jumbotron Header -->
-    <header class="jumbotron my-4">
-        <h1 class="display-3">Bienvenido a TechLink</h1>
-        <p class="lead">Tu zona tecnológica favorita</p>
-    </header>
-
-    <!-- Page Features -->
-    <div class="row text-center">
-
-        <div class="col-lg-3 col-md-6 mb-4" th:each="producto: ${productos}">
-            <div class="card h-100">
-                <img class="card-img-top"
-                     th:src="@{/images/{img} (img=${producto.imagen})} " alt="">
-                <div class="card-body">
-                    <p class="card-text" th:text="${producto.nombre}"></p>
-                </div>
-                <div class="card-footer">
-                    <a th:href="@{/productohome/{id} (id=${producto.id})}" class="btn btn-success">Ver producto</a>
-                </div>
-            </div>
+  <head th:replace="~{fragments/layout :: head('Vista general')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div class="admin-layout">
+      <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+      <main id="contenido" class="admin-main">
+        <div class="page-heading">
+          <div>
+            <span class="section-label">Tu centro de operaciones</span>
+            <h1>Todo tu negocio, conectado.</h1>
+            <p>Bienvenido a la administración de TechLink.</p>
+          </div>
+          <a class="button" href="/productos/create"
+            ><svg class="icon" aria-hidden="true">
+              <use href="/brand/icons.svg#plus"></use></svg
+            >Crear producto</a
+          >
         </div>
-
-
+        <div class="stats-grid">
+          <article>
+            <span>Productos en catálogo</span
+            ><strong th:text="${#lists.size(productos)}">12</strong
+            ><svg class="icon" aria-hidden="true">
+              <use href="/brand/icons.svg#box"></use>
+            </svg>
+          </article>
+          <article>
+            <span>Usuarios registrados</span
+            ><strong th:text="${totalUsuarios}">2</strong
+            ><svg class="icon" aria-hidden="true">
+              <use href="/brand/icons.svg#user"></use>
+            </svg>
+          </article>
+          <article>
+            <span>Órdenes de compra</span
+            ><strong th:text="${totalOrdenes}">1</strong
+            ><svg class="icon" aria-hidden="true">
+              <use href="/brand/icons.svg#receipt"></use>
+            </svg>
+          </article>
+          <article>
+            <span>Total en órdenes</span
+            ><strong
+              ><span
+                th:text="${'S/ ' + #numbers.formatDecimal(totalVentas, 1, 'COMMA', 2, 'POINT')}"
+                >S/ 0.00</span
+              ></strong
+            ><svg class="icon" aria-hidden="true">
+              <use href="/brand/icons.svg#bag"></use>
+            </svg>
+          </article>
+        </div>
+        <div class="admin-banner">
+          <div>
+            <h2>Un catálogo listo para explorar.</h2>
+            <p>
+              Gestiona tus productos, revisa el stock y mantén tu tienda al día.
+            </p>
+          </div>
+          <a href="/productos" class="button secondary">Gestionar catálogo</a>
+        </div>
+        <div class="section-heading">
+          <div>
+            <h2>Tu catálogo</h2>
+            <p>Los productos que conectan con tus clientes.</p>
+          </div>
+          <a href="/" class="text-link">Ver tienda</a>
+        </div>
+        <div class="product-grid admin-products">
+          <article
+            class="product-card"
+            th:each="p : ${productos}"
+            th:attr="data-price=${p.precio},data-name=${p.nombre}"
+          >
+            <a class="product-image" th:href="@{/productohome/{id}(id=${p.id})}"
+              ><img
+                loading="lazy"
+                th:src="@{/images/{img}(img=${p.imagen})}"
+                th:alt="${p.nombre}"
+                width="280"
+                height="230"
+            /></a>
+            <div class="product-info">
+              <span class="product-category" th:text="${p.categoria}"
+                >Audio</span
+              >
+              <h3>
+                <a
+                  th:href="@{/productohome/{id}(id=${p.id})}"
+                  th:text="${p.nombre}"
+                  >Producto</a
+                >
+              </h3>
+              <div class="product-bottom">
+                <strong class="price"
+                  ><span
+                    th:text="${'S/ ' + #numbers.formatDecimal(p.precio, 1, 'COMMA', 2, 'POINT')}"
+                    >S/ 0.00</span
+                  ></strong
+                ><a
+                  class="small-button"
+                  th:href="@{/productohome/{id}(id=${p.id})}"
+                  th:aria-label="${'Ver ' + p.nombre}"
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="/brand/icons.svg#eye"></use></svg
+                ></a>
+              </div>
+              <span
+                class="stock-text"
+                th:text="${p.cantidad > 0 ? 'Disponible' : 'Agotado'}"
+                >Disponible</span
+              >
+            </div>
+          </article>
+        </div>
+      </main>
     </div>
-    <!-- /.row -->
-
-</div>
-<!-- /.container -->
-
-<div th:include="administrador/template_admin.html::footer"></div>
-
-<!-- Bootstrap core JavaScript -->
-<script th:src="@{vendor/jquery/jquery.min.js}"></script>
-<script th:src="@{vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
-
-</body>
-
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
 </html>

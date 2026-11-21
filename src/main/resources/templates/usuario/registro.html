@@ -1,103 +1,103 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>TechLink</title>
-
-
-    <!-- Bootstrap core CSS -->
-    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}"
-          rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link th:href="@{/css/heroic-features.css}" rel="stylesheet">
-
-</head>
-
-<body>
-
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/}">Spring Ecommerce</a>
-
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarResponsive" aria-controls="navbarResponsive"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" th:href="@{/usuario/login}">Login</a>
-                </li>
-            </ul>
+  <head th:replace="~{fragments/layout :: head('Registro')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main id="contenido" class="container page">
+      <section class="auth-layout">
+        <div class="auth-story">
+          <img src="/brand/mark.svg" alt="" width="55" height="55" />
+          <h2>Tu mundo.<br />Más conectado.</h2>
+          <p>
+            Guarda tus compras y encuentra el próximo upgrade para tu día a día.
+          </p>
+          <div class="auth-collage">
+            <img
+              src="/images/Nintendo%20Switch%20OLED%20-%20Modelo%20Blanco.jpg"
+              alt="Nintendo Switch OLED"
+              width="320"
+              height="280"
+            />
+          </div>
+          <span>Gaming, audio y tecnología en TechLink.</span>
         </div>
-    </div>
-</nav>
-
-
-<!-- Page Content -->
-<div class="container">
-
-    <div class="card mb-3">
-        <div class="row no-gutters">
-            <div class="col-md-4"></div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h2>Registro</h2>
-
-                </div>
+        <div class="auth-form-wrap">
+          <a class="text-link" href="/">Volver a la tienda</a>
+          <h1>Crea tu cuenta</h1>
+          <p>Un solo lugar para seguir tus compras.</p>
+          <div class="alert error" th:if="${param.error != null}" role="alert">
+            El correo o la contraseña no son correctos.
+          </div>
+          <div
+            class="alert success"
+            th:if="${param.logout != null}"
+            role="status"
+          >
+            Cerraste tu sesión correctamente.
+          </div>
+          <div
+            class="alert success"
+            th:if="${param.registered != null}"
+            role="status"
+          >
+            Tu cuenta está lista. Ya puedes ingresar.
+          </div>
+          <div
+            class="alert error"
+            th:if="${errorRegistro != null}"
+            th:text="${errorRegistro}"
+            role="alert"
+          ></div>
+          <form class="stacked-form" th:action="@{/usuario/save}" method="post">
+            <label for="nombre">Nombre completo</label
+            ><input
+              id="nombre"
+              name="nombre"
+              autocomplete="name"
+              required
+              placeholder="Tu nombre"
+            /><label for="email">Correo electrónico</label
+            ><input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              placeholder="tucorreo@ejemplo.com"
+            /><label for="direccion">Dirección</label
+            ><input
+              id="direccion"
+              name="direccion"
+              autocomplete="street-address"
+              required
+              placeholder="Tu dirección en Perú"
+            /><label for="password">Contraseña</label>
+            <div class="password-wrap">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+                placeholder="Al menos 8 caracteres"
+              /><button
+                type="button"
+                class="toggle-password"
+                aria-controls="password"
+                aria-pressed="false"
+              >
+                Mostrar
+              </button>
             </div>
+            <button class="button full" type="submit">Crear cuenta</button>
+          </form>
+          <p class="auth-switch">
+            ¿Ya tienes cuenta? <a href="/usuario/login">Ingresa aquí</a>
+          </p>
         </div>
-    </div>
-    <form th:action="@{/usuario/save}" method="post">
-        <div class="form-group">
-            <label for="nombres">Nombres:</label> <input type="text"
-                                                         class="form-control" id="nombre" name="nombre" required
-                                                         placeholder="Ingrese sus nombres" autocomplete="off">
-        </div>
-
-        <div class="form-group">
-            <label for="email">Email:</label> <input type="email"
-                                                     class="form-control" id="email" name="email" required
-                                                     placeholder="Ingrese su email" autocomplete="off">
-        </div>
-
-        <div class="form-group">
-            <label for="direccion">Dirección:</label> <input type="text"
-                                                             class="form-control" id="direccion" name="direccion" required
-                                                             placeholder="Ingrese su dirección" autocomplete="off">
-        </div>
-
-        <div class="form-group">
-            <label for="pwd">Contraseña</label> <input type="password"
-                                                       class="form-control" id="password" name="password" required
-                                                       placeholder="Ingrese su contraseña" autocomplete="off">
-        </div>
-        <div class="col-sm-2">
-            <button type="submit" class="btn btn-success">Guardar</button>
-        </div>
-    </form>
-
-</div>
-
-<!-- /.container -->
-
-<!-- Footer -->
-<div th:include="usuario/template_usuario.html::footer"></div>
-
-<!-- Bootstrap core JavaScript -->
-<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
-<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
-
-</body>
-
+      </section>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
 </html>

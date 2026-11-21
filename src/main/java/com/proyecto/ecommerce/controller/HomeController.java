@@ -1,257 +1,278 @@
 package com.proyecto.ecommerce.controller;
 
-import com.proyecto.ecommerce.model.DetalleOrden;
-import com.proyecto.ecommerce.model.Orden;
-import com.proyecto.ecommerce.model.Producto;
-import com.proyecto.ecommerce.model.Usuario;
-import com.proyecto.ecommerce.service.IDetalleOrdenService;
-import com.proyecto.ecommerce.service.IOrdenService;
-import com.proyecto.ecommerce.service.IUsuarioService;
-import com.proyecto.ecommerce.service.ProductoService;
-
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
-// Imports para JasperReports
+import com.proyecto.ecommerce.model.*;
+import com.proyecto.ecommerce.repository.*;
+import com.proyecto.ecommerce.service.*;
+import jakarta.servlet.http.*;
+import java.io.*;
+import java.util.*;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
-@RequestMapping("/")
 public class HomeController {
 
-    private final Logger log = LoggerFactory.getLogger(HomeController.class);
+  private final ProductoService productos;
+  private final IUsuarioService usuarios;
+  private final IOrdenService ordenes;
+  private final IDetalleOrdenService detallesService;
+  private final IProductoRepository productoRepository;
 
-    @Autowired
-    private ProductoService productoService;
+  public HomeController(
+    ProductoService p,
+    IUsuarioService u,
+    IOrdenService o,
+    IDetalleOrdenService d,
+    IProductoRepository pr
+  ) {
+    productos = p;
+    usuarios = u;
+    ordenes = o;
+    detallesService = d;
+    productoRepository = pr;
+  }
 
-    @Autowired
-    private IUsuarioService usuarioService;
+  @SuppressWarnings("unchecked")
+  private List<DetalleOrden> cart(HttpSession s) {
+    if (s.getAttribute("cart") == null) s.setAttribute(
+      "cart",
+      new ArrayList<DetalleOrden>()
+    );
+    return (List<DetalleOrden>) s.getAttribute("cart");
+  }
 
-    @Autowired
-    private IOrdenService ordenService;
+  private void cartModel(Model model, HttpSession s) {
+    var items = cart(s);
+    var order = new Orden();
+    order.setTotal(items.stream().mapToDouble(DetalleOrden::getTotal).sum());
+    model.addAttribute("cart", items);
+    model.addAttribute("orden", order);
+  }
 
-    @Autowired
-    private IDetalleOrdenService detalleOrdenService;
+  private Producto producto(Integer id) {
+    return productos
+      .get(id)
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+  }
 
-    // NOTA IMPORTANTE: Estas variables globales 'detalles' y 'orden'
-    // funcionan para un solo usuario a la vez (proyecto académico).
-    // En producción, esto debería manejarse por Sesión para evitar cruce de datos.
-    List<DetalleOrden> detalles = new ArrayList<DetalleOrden>();
-    Orden orden = new Orden();
+  private Usuario usuario(Authentication a) {
+    return usuarios
+      .findByEmail(a.getName())
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+  }
 
-    @GetMapping("")
-    public String home(Model model, HttpSession session) {
-        log.info("Sesion del usuario: {}", session.getAttribute("idusuario"));
-        model.addAttribute("productos", productoService.findAll());
-        model.addAttribute("sesion", session.getAttribute("idusuario"));
-        return "usuario/home";
+  private Orden ownedOrder(Integer id, Authentication a) {
+    var o = ordenes
+      .findById(id)
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    var u = usuario(a);
+    if (
+      !"ADMIN".equals(u.getTipo()) && !o.getUsuario().getId().equals(u.getId())
+    ) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    return o;
+  }
+
+  @GetMapping("/")
+  public String home(
+    @RequestParam(defaultValue = "") String nombre,
+    @RequestParam(defaultValue = "") String categoria,
+    Model model
+  ) {
+    var all = productos.findAll();
+    model.addAttribute(
+      "productos",
+      all
+        .stream()
+        .filter(p ->
+          p
+            .getNombre()
+            .toLowerCase(Locale.ROOT)
+            .contains(nombre.toLowerCase(Locale.ROOT))
+        )
+        .filter(p -> categoria.isBlank() || p.getCategoria().equals(categoria))
+        .toList()
+    );
+    model.addAttribute("nombre", nombre);
+    model.addAttribute("categoria", categoria);
+    model.addAttribute(
+      "destacado",
+      all
+        .stream()
+        .filter(p -> p.getNombre().startsWith("Sony"))
+        .findFirst()
+        .orElse(all.isEmpty() ? null : all.get(0))
+    );
+    return "usuario/home";
+  }
+
+  @PostMapping("/search")
+  public String search(
+    @RequestParam String nombre,
+    org.springframework.web.servlet.mvc.support.RedirectAttributes redirect
+  ) {
+    redirect.addAttribute("nombre", nombre);
+    return "redirect:/";
+  }
+
+  @GetMapping("/productohome/{id}")
+  public String product(@PathVariable Integer id, Model m) {
+    m.addAttribute("producto", producto(id));
+    return "usuario/productohome";
+  }
+
+  @PostMapping("/cart")
+  public String addCart(
+    @RequestParam Integer id,
+    @RequestParam Integer cantidad,
+    HttpSession s
+  ) {
+    var p = producto(id);
+    var list = cart(s);
+    var existing = list
+      .stream()
+      .filter(d -> d.getProducto().getId().equals(id))
+      .findFirst();
+    int qty =
+      cantidad +
+      (existing.isPresent() ? (int) existing.get().getCantidad() : 0);
+    if (
+      cantidad < 1 || qty < 1 || qty > p.getCantidad()
+    ) throw new ResponseStatusException(
+      HttpStatus.BAD_REQUEST,
+      "Cantidad no disponible"
+    );
+    var d = existing.orElseGet(() -> {
+      var n = new DetalleOrden();
+      n.setProducto(p);
+      list.add(n);
+      return n;
+    });
+    d.setNombre(p.getNombre());
+    d.setCantidad(qty);
+    d.setPrecio(p.getPrecio());
+    d.setTotal(qty * p.getPrecio());
+    return "redirect:/getCart";
+  }
+
+  @PostMapping("/delete/cart/{id}")
+  public String remove(@PathVariable Integer id, HttpSession s) {
+    cart(s).removeIf(d -> d.getProducto().getId().equals(id));
+    return "redirect:/getCart";
+  }
+
+  @GetMapping("/getCart")
+  public String getCart(Model m, HttpSession s) {
+    cartModel(m, s);
+    return "usuario/carrito";
+  }
+
+  @GetMapping("/order")
+  public String order(Model m, HttpSession s, Authentication a) {
+    if (cart(s).isEmpty()) return "redirect:/getCart";
+    cartModel(m, s);
+    m.addAttribute("usuario", usuario(a));
+    return "usuario/resumenorden";
+  }
+
+  @PostMapping("/saveOrder")
+  @Transactional
+  public String saveOrder(HttpSession s, Authentication a) {
+    var items = cart(s);
+    if (items.isEmpty()) return "redirect:/getCart";
+    // Reload and lock stock: totals always come from current server-side prices.
+    var locked = new HashMap<Integer, Producto>();
+    items
+      .stream()
+      .map(d -> d.getProducto().getId())
+      .sorted()
+      .forEach(id ->
+        locked.put(id, productoRepository.findForCheckout(id).orElseThrow())
+      );
+    double total = 0;
+    for (var d : items) {
+      var p = locked.get(d.getProducto().getId());
+      if (
+        d.getCantidad() < 1 || d.getCantidad() > p.getCantidad()
+      ) throw new ResponseStatusException(
+        HttpStatus.CONFLICT,
+        "El stock cambió. Revisa tu carrito."
+      );
+      total += p.getPrecio() * d.getCantidad();
     }
-
-    @GetMapping("productohome/{id}")
-    public String productoHome(@PathVariable Integer id, Model model) {
-        log.info("Id producto enviado como parametro {}", id);
-        Producto producto = new Producto();
-        Optional<Producto> productoOptional = productoService.get(id);
-        producto = productoOptional.get();
-
-        model.addAttribute("producto", producto);
-        return "usuario/productohome";
+    var o = new Orden();
+    o.setUsuario(usuario(a));
+    o.setFechaCreacion(new Date());
+    o.setTotal(total);
+    o.setNumero(ordenes.generarNumeroOrden());
+    ordenes.save(o);
+    for (var d : items) {
+      var p = locked.get(d.getProducto().getId());
+      var line = new DetalleOrden(
+        null,
+        p.getNombre(),
+        d.getCantidad(),
+        p.getPrecio(),
+        p.getPrecio() * d.getCantidad()
+      );
+      line.setOrden(o);
+      line.setProducto(p);
+      detallesService.save(line);
+      p.setCantidad(p.getCantidad() - (int) d.getCantidad());
+      productos.save(p);
     }
+    items.clear();
+    return "redirect:/compraExitosa/" + o.getId();
+  }
 
-    @PostMapping("/cart")
-    public String addCart(@RequestParam Integer id, @RequestParam Integer cantidad, Model model) {
-        DetalleOrden detalleOrden = new DetalleOrden();
-        Producto producto = new Producto();
-        double sumaTotal = 0;
+  @GetMapping("/compraExitosa/{id}")
+  public String success(@PathVariable Integer id, Model m, Authentication a) {
+    var o = ownedOrder(id, a);
+    m.addAttribute("orden", o);
+    m.addAttribute("idOrden", id);
+    return "usuario/compra_exitosa";
+  }
 
-        Optional<Producto> optionalProducto = productoService.get(id);
-        log.info("Producto agregado: {}", optionalProducto.get());
-        log.info("Cantidad: {}", cantidad);
-        producto = optionalProducto.get();
-
-        detalleOrden.setCantidad(cantidad);
-        detalleOrden.setPrecio(producto.getPrecio());
-        detalleOrden.setNombre(producto.getNombre());
-        detalleOrden.setTotal(producto.getPrecio() * cantidad);
-        detalleOrden.setProducto(producto);
-
-        // Validar que el producto no se añada dos veces
-        Integer idProducto = producto.getId();
-        boolean ingresado = detalles.stream().anyMatch(p -> p.getProducto().getId() == idProducto);
-        if (!ingresado) {
-            detalles.add(detalleOrden);
-        }
-
-        sumaTotal = detalles.stream().mapToDouble(dt -> dt.getTotal()).sum();
-
-        orden.setTotal(sumaTotal);
-        model.addAttribute("cart", detalles);
-        model.addAttribute("orden", orden);
-
-        return "usuario/carrito";
+  @GetMapping("/pdf/{id}")
+  public void pdf(
+    @PathVariable Integer id,
+    Authentication a,
+    HttpServletResponse response
+  ) throws IOException, JRException {
+    var o = ownedOrder(id, a);
+    try (
+      InputStream stream = getClass().getResourceAsStream(
+        "/reports/boleta_factura.jrxml"
+      )
+    ) {
+      if (stream == null) throw new ResponseStatusException(
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+      var report = JasperCompileManager.compileReport(stream);
+      Map<String, Object> params = new HashMap<>();
+      params.put("nombreCliente", o.getUsuario().getNombre());
+      params.put("emailCliente", o.getUsuario().getEmail());
+      params.put("total", o.getTotal());
+      var print = JasperFillManager.fillReport(
+        report,
+        params,
+        new JRBeanCollectionDataSource(o.getDetalles())
+      );
+      response.setContentType("application/pdf");
+      response.setHeader(
+        "Content-Disposition",
+        "inline; filename=Comprobante_Orden_" + o.getNumero() + ".pdf"
+      );
+      JasperExportManager.exportReportToPdfStream(
+        print,
+        response.getOutputStream()
+      );
     }
-
-    // Eliminar un producto del carrito
-    @GetMapping("/delete/cart/{id}")
-    public String deleteProductoCart(@PathVariable Integer id, Model model) {
-        // Lista nueva de productos
-        List<DetalleOrden> ordenesNueva = new ArrayList<DetalleOrden>();
-
-        for (DetalleOrden detalleOrden : detalles) {
-            if (detalleOrden.getProducto().getId() != id) {
-                ordenesNueva.add(detalleOrden);
-            }
-        }
-
-        // Colocar la nueva lista con los productos restantes
-        detalles = ordenesNueva;
-
-        double sumaTotal = 0;
-        sumaTotal = detalles.stream().mapToDouble(dt -> dt.getTotal()).sum();
-        orden.setTotal(sumaTotal);
-        model.addAttribute("cart", detalles);
-        model.addAttribute("orden", orden);
-
-        return "usuario/carrito";
-    }
-
-    @GetMapping("/getCart")
-    public String getCart(Model model, HttpSession session) {
-        model.addAttribute("cart", detalles);
-        model.addAttribute("orden", orden);
-        model.addAttribute("sesion", session.getAttribute("idusuario"));
-        return "/usuario/carrito";
-    }
-
-    @GetMapping("/order")
-    public String order(Model model, HttpSession session) {
-        // 1. Verificar si el usuario está logueado
-        Object idUsuario = session.getAttribute("idusuario");
-
-        if (idUsuario == null) {
-            // Si es nulo, redirigir al registro/login
-            return "redirect:/usuario/login";
-        }
-
-        // 2. Si existe sesión, continuar normalmente
-        Usuario usuario = usuarioService.findById(Integer.parseInt(idUsuario.toString())).get();
-
-        model.addAttribute("cart", detalles);
-        model.addAttribute("orden", orden);
-        model.addAttribute("usuario", usuario);
-
-        return "usuario/resumenorden";
-    }
-
-    // Guardar la orden
-    @GetMapping("/saveOrder")
-    public String saveOrder(HttpSession session) {
-        // También protegemos este método por si intentan guardar sin sesión
-        Object idUsuario = session.getAttribute("idusuario");
-        if (idUsuario == null) {
-            return "redirect:/usuario/registro";
-        }
-
-        Date fechaCreacion = new Date();
-        orden.setFechaCreacion(fechaCreacion);
-        orden.setNumero(ordenService.generarNumeroOrden());
-
-        // Usuario
-        Usuario usuario = usuarioService.findById(Integer.parseInt(idUsuario.toString())).get();
-        orden.setUsuario(usuario);
-
-        // Guardar la orden y OBTENER el objeto guardado (con el ID generado)
-        Orden ordenGuardada = ordenService.save(orden);
-
-        // Guardar los detalles
-        for (DetalleOrden dt : detalles) {
-            dt.setOrden(ordenGuardada);
-            detalleOrdenService.save(dt);
-        }
-
-        // Limpiar la lista y la orden local
-        orden = new Orden();
-        detalles.clear();
-
-        // Redirigir a la vista de éxito pasando el ID de la orden para el PDF
-        return "redirect:/compraExitosa/" + ordenGuardada.getId();
-    }
-
-    @PostMapping("/search")
-    public String searchProduct(@RequestParam String nombre, Model model) {
-        log.info("Nombre del producto: {}", nombre);
-        List<Producto> productos = productoService.findAll().stream()
-                .filter(p -> p.getNombre().toLowerCase().contains(nombre.toLowerCase()))
-                .collect(Collectors.toList());
-        model.addAttribute("productos", productos);
-        return "usuario/home";
-    }
-
-    // ==========================================
-    // SECCIÓN DE JASPER REPORTS (PDF)
-    // ==========================================
-
-    @GetMapping("/compraExitosa/{id}")
-    public String compraExitosa(@PathVariable Integer id, Model model) {
-        // Pasamos el ID a la vista para que el botón "Descargar PDF" sepa qué descargar
-        model.addAttribute("idOrden", id);
-        return "usuario/compra_exitosa";
-    }
-
-    @GetMapping("/pdf/{id}")
-    public void generarPdf(@PathVariable Integer id, HttpServletResponse response) throws IOException, JRException {
-
-        // 1. Buscar la orden en la Base de Datos
-        Optional<Orden> ordenOptional = ordenService.findById(id);
-        if (ordenOptional.isEmpty()) {
-            // Si no existe, redirigir o no hacer nada (aquí podrías manejar un error)
-            return;
-        }
-        Orden ordenDb = ordenOptional.get();
-
-        // 2. Cargar el archivo .jrxml desde resources/reports
-        // Asegúrate que la ruta src/main/resources/reports/boleta_factura.jrxml exista
-        InputStream reportStream = getClass().getResourceAsStream("/reports/boleta_factura.jrxml");
-
-        if (reportStream == null) {
-            log.error("Archivo no encontrado: /reports/boleta_factura.jrxml");
-            return;
-        }
-
-        // 3. Compilar el reporte
-        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
-
-        // 4. Parámetros (Datos del Cliente y Totales)
-        Map<String, Object> params = new HashMap<>();
-        params.put("nombreCliente", ordenDb.getUsuario().getNombre());
-        params.put("emailCliente", ordenDb.getUsuario().getEmail());
-        params.put("total", ordenDb.getTotal());
-
-        // 5. Datasource (La lista de productos)
-        // AQUI ESTABA LA CLAVE: 'getDetalles()' debe coincidir con tu entidad Orden
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(ordenDb.getDetalles());
-
-        // 6. Llenar el reporte con datos
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, dataSource);
-
-        // 7. Configurar la respuesta del navegador para descargar PDF
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=Comprobante_Orden_" + ordenDb.getNumero() + ".pdf");
-
-        // 8. Enviar el PDF al usuario
-        JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
-    }
+  }
 }

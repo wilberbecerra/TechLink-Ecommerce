@@ -1,27 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <title>Compra Exitosa | TechLink</title>
-    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
-</head>
-<body>
-
-<div class="container text-center mt-5">
-    <div class="jumbotron">
-        <h1 class="display-4 text-success">¡Gracias por tu compra!</h1>
-        <p class="lead">Tu orden ha sido procesada correctamente.</p>
-        <hr class="my-4">
-        <p>Puedes descargar el detalle de tu compra aquí:</p>
-
-        <a th:href="@{/pdf/{id} (id=${idOrden}) }" class="btn btn-primary btn-lg" target="_blank">
-            Descargar Comprobante PDF
-        </a>
-
-        <br><br>
-        <a th:href="@{/}" class="btn btn-secondary">Volver al Inicio</a>
-    </div>
-</div>
-
-</body>
+  <head th:replace="~{fragments/layout :: head('Compra confirmada')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main id="contenido" class="container page">
+      <section class="success-page">
+        <div class="success-icon">
+          <svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#check"></use>
+          </svg>
+        </div>
+        <span class="pill">Compra confirmada</span>
+        <h1>Gracias por elegir TechLink.</h1>
+        <p>Tu pedido ya forma parte de tu mundo conectado.</p>
+        <div class="success-order">
+          <div>
+            <span>Número de orden</span
+            ><strong th:text="${orden.numero}"></strong>
+          </div>
+          <div>
+            <span>Total de compra</span
+            ><strong
+              ><span
+                th:text="${'S/ ' + #numbers.formatDecimal(orden.total, 1, 'COMMA', 2, 'POINT')}"
+                >S/ 0.00</span
+              ></strong
+            >
+          </div>
+        </div>
+        <div class="action-row">
+          <a
+            class="button"
+            th:href="@{/pdf/{id}(id=${idOrden})}"
+            target="_blank"
+            rel="noopener"
+            ><svg class="icon" aria-hidden="true">
+              <use href="/brand/icons.svg#download"></use></svg
+            >Ver comprobante PDF</a
+          ><a class="button secondary" href="/usuario/compras">Mis compras</a>
+        </div>
+        <a href="/" class="text-link">Volver a la tienda</a>
+      </section>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
 </html>

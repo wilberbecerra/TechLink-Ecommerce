@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Revisa tu solicitud')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main id="contenido" class="container page">
+      <section class="empty-state">
+        <span class="pill" th:text="${status}">Error</span>
+        <h1
+          th:text="${status == 404 ? 'No encontramos esta página.' : status == 403 ? 'Esta sección necesita otro acceso.' : 'No pudimos completar la solicitud.'}"
+        ></h1>
+        <p
+          th:text="${status == 400 || status == 409 ? 'Revisa los datos y las unidades disponibles antes de volver a intentar.' : 'Vuelve a la tienda para continuar.'}"
+        ></p>
+        <div class="action-row">
+          <a class="button" href="/">Volver a la tienda</a
+          ><a class="button secondary" href="/getCart">Ver carrito</a>
+        </div>
+      </section>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
+</html>

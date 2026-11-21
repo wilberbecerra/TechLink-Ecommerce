@@ -1,119 +1,112 @@
 package com.proyecto.ecommerce.controller;
 
-
 import com.proyecto.ecommerce.model.Producto;
-import com.proyecto.ecommerce.model.Usuario;
-import com.proyecto.ecommerce.service.IUsuarioService;
-import com.proyecto.ecommerce.service.ProductoService;
-import com.proyecto.ecommerce.service.UploadFileService;
-import com.proyecto.ecommerce.service.UsuarioServiceImpl;
-import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.proyecto.ecommerce.repository.IDetalleOrdenRepository;
+import com.proyecto.ecommerce.service.*;
+import java.io.IOException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @RequestMapping("/productos")
 public class ProductoController {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(ProductoController.class);
+  private final ProductoService productos;
+  private final IUsuarioService usuarios;
+  private final UploadFileService upload;
+  private final IDetalleOrdenRepository detalles;
 
-    @Autowired
-    private ProductoService productoService;
+  public ProductoController(
+    ProductoService p,
+    IUsuarioService u,
+    UploadFileService up,
+    IDetalleOrdenRepository d
+  ) {
+    productos = p;
+    usuarios = u;
+    upload = up;
+    detalles = d;
+  }
 
-    @Autowired
-    private IUsuarioService usuarioService;
+  private Producto find(Integer id) {
+    return productos
+      .get(id)
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+  }
 
+  private void validate(Producto p) {
+    if (
+      p.getNombre() == null ||
+      p.getNombre().isBlank() ||
+      p.getNombre().length() > 255 ||
+      p.getDescripcion() == null ||
+      p.getDescripcion().isBlank() ||
+      p.getDescripcion().length() > 2000 ||
+      p.getCantidad() < 0 ||
+      !Double.isFinite(p.getPrecio()) ||
+      p.getPrecio() < 0
+    ) throw new ResponseStatusException(
+      HttpStatus.BAD_REQUEST,
+      "Revisa los datos del producto."
+    );
+  }
 
+  @GetMapping("")
+  public String show(Model m) {
+    m.addAttribute("productos", productos.findAll());
+    return "productos/show";
+  }
 
-    @Autowired
-    private UploadFileService upload;
+  @GetMapping("/create")
+  public String create() {
+    return "productos/create";
+  }
 
+  @PostMapping("/save")
+  public String save(
+    @ModelAttribute Producto p,
+    @RequestParam("img") MultipartFile file,
+    Authentication a
+  ) throws IOException {
+    validate(p);
+    p.setId(null);
+    p.setUsuario(usuarios.findByEmail(a.getName()).orElseThrow());
+    p.setImagen(upload.saveImage(file));
+    productos.save(p);
+    return "redirect:/productos";
+  }
 
-    @GetMapping("")
-    public String Show(Model model){
-        model.addAttribute("productos", productoService.findAll());
-        return "productos/show";
-    }
+  @GetMapping("/edit/{id}")
+  public String edit(@PathVariable Integer id, Model m) {
+    m.addAttribute("producto", find(id));
+    return "productos/edit";
+  }
 
-    @GetMapping("/create")
-    public String create(){
-        return "productos/create";
-    }
+  @PostMapping("/update")
+  public String update(
+    @ModelAttribute Producto p,
+    @RequestParam("img") MultipartFile file
+  ) throws IOException {
+    validate(p);
+    var old = find(p.getId());
+    p.setUsuario(old.getUsuario());
+    p.setImagen(file.isEmpty() ? old.getImagen() : upload.saveImage(file));
+    productos.update(p);
+    if (!file.isEmpty()) upload.deleteImage(old.getImagen());
+    return "redirect:/productos";
+  }
 
-    @PostMapping("/save")
-    public String save(Producto producto, @RequestParam("img") MultipartFile file, HttpSession session) throws IOException {
-        LOGGER.info("Este es el objeto producto: {}", producto);
-        Usuario u = usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
-        producto.setUsuario(u);
-
-        //imagen
-        if (producto.getId()==null){ //cuando se crea un producto
-            String nombreImagen = upload.saveImage(file);
-            producto.setImagen(nombreImagen);
-        }
-        else{
-
-        }
-        productoService.save(producto);
-        return "redirect:/productos";
-    }
-
-    @GetMapping("/edit/{id}")
-    public String edit(@PathVariable Integer id, Model model){
-
-        Producto producto = new Producto();
-        Optional<Producto> optionalProducto = productoService.get(id);
-        producto = optionalProducto.get();
-
-        LOGGER.info("Producto buscado: {}", producto);
-        model.addAttribute("producto", producto);
-
-        return "productos/edit";
-    }
-
-    @PostMapping("/update")
-    public String update(Producto producto, @RequestParam("img") MultipartFile file) throws IOException {
-        Producto p = new Producto();
-        p= productoService.get(producto.getId()).get();
-
-        if(file.isEmpty()){ //cuando se edita un producto y no se cambia la imagen
-
-            producto.setImagen(p.getImagen());
-        }
-        else{ //cuando se edita un producto y se cambia la imagen
-            //eliminar cuando no sea la imagen por defecto
-            if(!p.getImagen().equals("default.jpg")){
-                upload.deleteImage(p.getImagen());
-            }
-
-            String nombreImagen = upload.saveImage(file);
-            producto.setImagen(nombreImagen);
-        }
-        producto.setUsuario(p.getUsuario());
-        productoService.update(producto);
-        return "redirect:/productos";
-    }
-
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Integer id){
-
-        Producto p = new Producto();
-        p = productoService.get(id).get();
-        //eliminar cuando no sea la imagen por defecto
-        if(!p.getImagen().equals("default.jpg")){
-            upload.deleteImage(p.getImagen());
-        }
-
-        productoService.delete(id);
-        return "redirect:/productos";
-    }
-
+  @PostMapping("/delete/{id}")
+  public String delete(@PathVariable Integer id) {
+    var p = find(id);
+    if (detalles.existsByProducto_Id(id)) return "redirect:/productos?inUse";
+    productos.delete(id);
+    upload.deleteImage(p.getImagen());
+    return "redirect:/productos";
+  }
 }

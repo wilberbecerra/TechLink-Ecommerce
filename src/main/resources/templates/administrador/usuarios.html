@@ -1,71 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
-<head>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
-
-  <title>TechLink</title>
-
-
-    <!-- Bootstrap core CSS -->
-    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}"
-          rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link th:href="@{/css/heroic-features.css}" rel="stylesheet">
-
-</head>
-
-<body>
-
-  <!-- Navigation -->
-  <div th:include="administrador/template_admin.html::header"></div>
-
-<!-- Page Content -->
-<div class="container">
-
-
-  <!-- Page Heading/Breadcrumbs -->
-  <h1 class="mt-4 mb-3">
-      TechLink <small>Usuarios</small>
-  </h1>
-
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-    <li class="breadcrumb-item active">Ver Usuarios</li>
-  </ol>
-  <h2>Usuarios</h2>
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">Nombre</th>
-        <th scope="col">Email</th>
-        <th scope="col">Dirección</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr th:each="usuario: ${usuarios}">
-        <td th:text="${usuario.nombre}">Nombre</td>
-        <td th:text="${usuario.email}">Email</td>
-        <td th:text="${usuario.direccion}"></td>
-      </tr>       
-    </tbody>
-  </table>
-
-</div>
-<!-- /.container -->
-
-<!-- Footer -->
-  <div th:include="administrador/template_admin.html::footer"></div>
-
-  <!-- Bootstrap core JavaScript -->
-  <script th:src="@{/vendor/jquery/jquery.min.js}"></script>
-  <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
-
-</body>
-
+  <head th:replace="~{fragments/layout :: head('Usuarios')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <div class="admin-layout">
+      <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+      <main id="contenido" class="admin-main">
+        <div class="page-heading">
+          <div>
+            <span class="section-label">Administración / Comunidad</span>
+            <h1>Usuarios</h1>
+            <p>Las personas que forman parte de TechLink.</p>
+          </div>
+          <span
+            class="pill"
+            th:text="${#lists.size(usuarios) + ' usuarios'}"
+          ></span>
+        </div>
+        <div class="panel table-panel">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Correo electrónico</th>
+                  <th>Dirección</th>
+                  <th>Rol</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="u : ${usuarios}">
+                  <td>
+                    <div class="user-cell">
+                      <span
+                        class="avatar"
+                        th:text="${#strings.substring(u.nombre,0,1)}"
+                      ></span
+                      ><strong th:text="${u.nombre}"></strong>
+                    </div>
+                  </td>
+                  <td th:text="${u.email}"></td>
+                  <td th:text="${u.direccion}"></td>
+                  <td>
+                    <span
+                      class="pill"
+                      th:text="${u.tipo == 'ADMIN' ? 'Administrador' : 'Cliente'}"
+                    ></span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
 </html>

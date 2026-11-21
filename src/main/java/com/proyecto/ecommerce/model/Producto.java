@@ -4,100 +4,144 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "productos")
-
 public class Producto {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private String nombre;
-    private String descripcion;
-    private String imagen;
-    private double precio;
-    private int cantidad;
 
-    @ManyToOne
-    private Usuario usuario;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 
-    public Producto() {
-        // Constructor vacío
-    }
+  private String nombre;
 
-    public Producto(Integer id, String nombre, String descripcion, String imagen, double precio, int cantidad, Usuario usuario) {
-        super();
-        this.id = id;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.imagen = imagen;
-        this.precio = precio;
-        this.cantidad = cantidad;
-        this.usuario = usuario;
-    }
+  @Column(length = 2000)
+  private String descripcion;
 
-    public Integer getId() {
-        return id;
-    }
+  private String imagen;
+  private double precio;
+  private int cantidad;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  @ManyToOne
+  private Usuario usuario;
 
-    public String getNombre() {
-        return nombre;
-    }
+  public Producto() {
+    // Constructor vacío
+  }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+  public Producto(
+    Integer id,
+    String nombre,
+    String descripcion,
+    String imagen,
+    double precio,
+    int cantidad,
+    Usuario usuario
+  ) {
+    super();
+    this.id = id;
+    this.nombre = nombre;
+    this.descripcion = descripcion;
+    this.imagen = imagen;
+    this.precio = precio;
+    this.cantidad = cantidad;
+    this.usuario = usuario;
+  }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-    public String getImagen() {
-        return imagen;
-    }
+  public String getNombre() {
+    return nombre;
+  }
 
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
-    }
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
+  }
 
-    public double getPrecio() {
-        return precio;
-    }
+  public String getDescripcion() {
+    return descripcion;
+  }
 
-    public void setPrecio(double precio) {
-        this.precio = precio;
-    }
+  public void setDescripcion(String descripcion) {
+    this.descripcion = descripcion;
+  }
 
-    public int getCantidad() {
-        return cantidad;
-    }
+  public String getImagen() {
+    return imagen;
+  }
 
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
-    }
+  @Transient
+  public String getCategoria() {
+    String n = nombre == null ? "" : nombre.toLowerCase(java.util.Locale.ROOT);
+    if (
+      n.contains("laptop") ||
+      n.contains("asus") ||
+      n.contains("tablet") ||
+      n.contains("monitor")
+    ) return "Computación";
+    if (
+      n.contains("sony") || n.contains("yeti") || n.contains("echo")
+    ) return "Audio";
+    if (
+      n.contains("switch") ||
+      n.contains("silla") ||
+      n.contains("mouse") ||
+      n.contains("teclado")
+    ) return "Gaming";
+    return "Hogar y oficina";
+  }
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
+  public void setImagen(String imagen) {
+    this.imagen = imagen;
+  }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+  public double getPrecio() {
+    return precio;
+  }
 
-    @Override
-    public String toString() {
-        return "Producto{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", imagen='" + imagen + '\'' +
-                ", precio=" + precio +
-                ", cantidad=" + cantidad +
-                '}';
-    }
+  public void setPrecio(double precio) {
+    this.precio = precio;
+  }
+
+  public int getCantidad() {
+    return cantidad;
+  }
+
+  public void setCantidad(int cantidad) {
+    this.cantidad = cantidad;
+  }
+
+  public Usuario getUsuario() {
+    return usuario;
+  }
+
+  public void setUsuario(Usuario usuario) {
+    this.usuario = usuario;
+  }
+
+  @Override
+  public String toString() {
+    return (
+      "Producto{" +
+      "id=" +
+      id +
+      ", nombre='" +
+      nombre +
+      '\'' +
+      ", descripcion='" +
+      descripcion +
+      '\'' +
+      ", imagen='" +
+      imagen +
+      '\'' +
+      ", precio=" +
+      precio +
+      ", cantidad=" +
+      cantidad +
+      '}'
+    );
+  }
 }

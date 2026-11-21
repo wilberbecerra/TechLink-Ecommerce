@@ -1,81 +1,101 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>TechLink</title>
-
-    <!-- Bootstrap core CSS -->
-    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link th:href="@{/css/heroic-features.css}" rel="stylesheet">
-
-</head>
-
-<body>
-
-<!-- Navigation -->
-<div th:include="usuario/template_usuario.html::header" th:if="${sesion==null}"></div>
-
-<div th:include="usuario/template_usuario.html::header-user" th:unless="${sesion==null}"> </div>
-
-<!-- Page Content -->
-<div class="container">
-
-    <!-- Page Heading/Breadcrumbs -->
-    <h1 class="mt-4 mb-3">
-        TechLink <small>Detalles</small>
-    </h1>
-
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-        <li class="breadcrumb-item"><a th:href="@{/usuario/compras}">Compras</a></li>
-        <li class="breadcrumb-item active">Detalle de Compra</li>
-    </ol>
-
-    <!-- Blog Post -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-lg-12">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">Cantidad</th>
-                            <th scope="col">Producto</th>
-                            <th scope="col">Precio</th>
-                            <th scope="col">Total</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="detalle:${detalles}">
-                            <td th:text="${detalle.cantidad}"></td>
-                            <td th:text="${detalle.producto.nombre}"></td>
-                            <td th:text="${detalle.precio}"></td>
-                            <td th:text="${detalle.total}"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  <head th:replace="~{fragments/layout :: head('Detalle de compra')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main id="contenido" class="container page">
+      <nav class="breadcrumb">
+        <a href="/usuario/compras">Mis compras</a><span>/</span
+        ><span>Detalle</span>
+      </nav>
+      <div class="page-heading">
+        <div>
+          <span class="section-label">Detalle de compra</span>
+          <h1>Orden <span th:text="${'#' + orden.numero}"></span></h1>
+          <p
+            th:text="${#dates.format(orden.fechaCreacion,'dd MMMM yyyy · HH:mm')}"
+          ></p>
         </div>
-    </div>
-</div>
-<!-- /.container -->
-
-<!-- Footer -->
-<div th:include="usuario/template_usuario.html::footer"></div>
-
-<!-- Bootstrap core JavaScript -->
-<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
-<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
-
-</body>
-
+        <a
+          class="button"
+          th:href="@{/pdf/{id}(id=${orden.id})}"
+          target="_blank"
+          rel="noopener"
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#download"></use></svg
+          >Comprobante PDF</a
+        >
+      </div>
+      <section class="order-customer panel">
+        <div>
+          <span>Cliente</span
+          ><strong th:text="${orden.usuario.nombre}"></strong>
+        </div>
+        <div>
+          <span>Correo electrónico</span
+          ><strong th:text="${orden.usuario.email}"></strong>
+        </div>
+        <div>
+          <span>Dirección</span
+          ><strong th:text="${orden.usuario.direccion}"></strong>
+        </div>
+      </section>
+      <div class="panel table-panel">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th class="numeric">Cantidad</th>
+                <th class="numeric">Precio unitario</th>
+                <th class="numeric">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="d : ${detalles}">
+                <td>
+                  <div class="table-product">
+                    <img
+                      th:src="@{/images/{img}(img=${d.producto.imagen})}"
+                      alt=""
+                      width="56"
+                      height="56"
+                    /><strong th:text="${d.nombre}"></strong>
+                  </div>
+                </td>
+                <td
+                  class="numeric"
+                  th:text="${#numbers.formatInteger(d.cantidad,1)}"
+                ></td>
+                <td class="numeric">
+                  <span
+                    th:text="${'S/ ' + #numbers.formatDecimal(d.precio, 1, 'COMMA', 2, 'POINT')}"
+                    >S/ 0.00</span
+                  >
+                </td>
+                <td class="numeric">
+                  <strong
+                    ><span
+                      th:text="${'S/ ' + #numbers.formatDecimal(d.total, 1, 'COMMA', 2, 'POINT')}"
+                      >S/ 0.00</span
+                    ></strong
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="order-total">
+          <span>Total de la orden</span
+          ><strong
+            ><span
+              th:text="${'S/ ' + #numbers.formatDecimal(orden.total, 1, 'COMMA', 2, 'POINT')}"
+              >S/ 0.00</span
+            ></strong
+          >
+        </div>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
 </html>

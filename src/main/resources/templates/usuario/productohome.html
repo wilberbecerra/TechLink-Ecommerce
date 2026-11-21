@@ -1,81 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>TechLink</title>
-
-    <!-- Bootstrap core CSS -->
-    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link th:href="@{/css/heroic-features.css}" rel="stylesheet">
-</head>
-
-<body>
-
-<!-- Navigation -->
-<div th:include="usuario/template_usuario.html::header"></div>
-
-<!-- Page Content -->
-<div class="container">
-
-    <!-- Page Heading/Breadcrumbs -->
-    <h1 class="mt-4 mb-3">
-        TechLink <small>Producto</small>
-    </h1>
-
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-        <li class="breadcrumb-item active">Producto</li>
-    </ol>
-
-    <!-- Blog Post -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-lg-6">
-                    <a href="#"> <img class="img-fluid rounded"
-                                      th:src="@{/images/{img}(img=${producto.imagen})}" alt="Producto"></a>
-                </div>
-                <div class="col-lg-6">
-                    <form th:action="@{/cart}" method="POST">
-                        <input type="hidden" th:value="${producto.id}" name="id">
-                        <h2 class="card-title" th:text="${producto.nombre}"></h2>
-
-                        <ul class="list-group">
-                            <li class="list-group-item"><h5 th:text="'Precio: ' + ${producto.precio}"></h5></li>
-                            <li class="list-group-item">
-                                <p th:text="'Descripción: ' + ${producto.descripcion}"></p>
-                            </li>
-                            <li class="list-group-item"><h6>
-                                Cantidad: <input type="number" id="cantidad" name="cantidad"
-                                                 autocomplete="off" min="1" max="5" value="1">
-                            </h6></li>
-                        </ul>
-
-                        <button type="submit" class="btn btn-dark">Añadir al carrito</button>
-
-                    </form>
-                </div>
-            </div>
+  <head th:replace="~{fragments/layout :: head('Detalle del producto')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main id="contenido" class="container page">
+      <nav class="breadcrumb" aria-label="Ubicación">
+        <a href="/">Inicio</a><span>/</span><a href="/#catalogo">Catálogo</a
+        ><span>/</span><span th:text="${producto.categoria}">Producto</span>
+      </nav>
+      <div class="product-detail">
+        <div class="detail-image">
+          <img
+            th:src="@{/images/{img}(img=${producto.imagen})}"
+            th:alt="${producto.nombre}"
+            width="550"
+            height="520"
+          />
         </div>
-    </div>
-
-</div>
-<!-- /.container -->
-
-<!-- Footer -->
-<div th:include="usuario/template_usuario.html::footer"></div>
-
-<!-- Bootstrap core JavaScript -->
-<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
-<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
-
-</body>
-
+        <section class="detail-copy">
+          <span class="pill" th:text="${producto.categoria}">Audio</span>
+          <h1 th:text="${producto.nombre}">Producto</h1>
+          <p class="detail-description" th:text="${producto.descripcion}"></p>
+          <div class="detail-price">
+            <span
+              th:text="${'S/ ' + #numbers.formatDecimal(producto.precio, 1, 'COMMA', 2, 'POINT')}"
+              >S/ 0.00</span
+            ><span>Precio en soles</span>
+          </div>
+          <p
+            class="stock-text"
+            th:text="${producto.cantidad > 0 ? producto.cantidad + ' unidades disponibles' : 'Producto agotado'}"
+          ></p>
+          <form th:action="@{/cart}" method="post" class="add-cart-form">
+            <input type="hidden" name="id" th:value="${producto.id}" /><label
+              for="cantidad"
+              >Cantidad</label
+            >
+            <div class="buy-row">
+              <input
+                id="cantidad"
+                name="cantidad"
+                type="number"
+                min="1"
+                th:max="${producto.cantidad}"
+                value="1"
+                required
+                th:disabled="${producto.cantidad == 0}"
+              /><button
+                class="button"
+                type="submit"
+                th:disabled="${producto.cantidad == 0}"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="/brand/icons.svg#bag"></use></svg
+                >Agregar al carrito
+              </button>
+            </div>
+          </form>
+          <div class="detail-facts">
+            <span
+              ><svg class="icon" aria-hidden="true">
+                <use href="/brand/icons.svg#box"></use></svg
+              >Consulta stock en tiempo real</span
+            ><span
+              ><svg class="icon" aria-hidden="true">
+                <use href="/brand/icons.svg#receipt"></use></svg
+              >Comprobante de tu compra en PDF</span
+            >
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
 </html>

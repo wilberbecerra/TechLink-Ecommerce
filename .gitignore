@@ -31,3 +31,17 @@ build/
 
 ### VS Code ###
 .vscode/
+
+.local/
+images/upload-*
+.env
+.env.*
+!.env.example
+*.log
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+*.bak
