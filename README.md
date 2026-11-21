@@ -14,7 +14,6 @@
 </p>
 
 <p align="center">
-  <a href="#el-rediseño">Rediseño</a> ·
   <a href="#galería">Galería</a> ·
   <a href="#ejecución-local">Instalación</a>
 </p>
