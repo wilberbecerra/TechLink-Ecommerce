@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:fragment="head(title)">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="TechLink: computación, audio, gaming y tecnología para tu día a día."
+    />
+    <title th:text="${title + ' | TechLink'}">TechLink</title>
+    <link rel="icon" type="image/svg+xml" href="/brand/mark.svg" />
+    <link rel="stylesheet" href="/css/techlink.css" />
+    <script defer src="/js/techlink.js"></script>
+  </head>
+  <body>
+    <header th:fragment="header">
+      <a class="skip" href="#contenido">Saltar al contenido</a>
+      <div class="topline">
+        <div class="container">
+          <span>Tu zona tecnológica favorita.</span
+          ><span>Computación, audio y gaming en un solo lugar</span>
+        </div>
+      </div>
+      <div class="nav-wrap">
+        <nav class="container main-nav" aria-label="Principal">
+          <a href="/"
+            ><img
+              class="logo"
+              src="/brand/techlink.svg"
+              alt="TechLink, inicio"
+              width="185"
+              height="40"
+          /></a>
+          <form class="search-form" action="/" method="get">
+            <label class="sr-only" for="buscar">Buscar productos</label
+            ><input
+              id="buscar"
+              name="nombre"
+              type="search"
+              placeholder="¿Qué estás buscando?"
+              th:value="${param.nombre}"
+            /><button type="submit" aria-label="Buscar">
+              <svg class="icon" aria-hidden="true">
+                <use href="/brand/icons.svg#search"></use>
+              </svg>
+            </button>
+          </form>
+          <div class="nav-actions">
+            <a
+              th:if="${currentUser == null}"
+              href="/usuario/login"
+              class="account"
+              aria-label="Ingresar a mi cuenta"
+              ><svg class="icon" aria-hidden="true">
+                <use href="/brand/icons.svg#user"></use></svg
+              ><span>Mi cuenta</span></a
+            >
+            <details th:if="${currentUser != null}" class="account-menu">
+              <summary aria-label="Menú de mi cuenta">
+                <svg class="icon" aria-hidden="true">
+                  <use href="/brand/icons.svg#user"></use></svg
+                ><span th:text="${currentUser.nombre}">Mi cuenta</span>
+              </summary>
+              <div class="account-dropdown">
+                <a th:if="${isAdmin}" href="/administrador">Administración</a
+                ><a href="/usuario/compras">Mis compras</a>
+                <form th:action="@{/logout}" method="post">
+                  <button type="submit">Cerrar sesión</button>
+                </form>
+              </div>
+            </details>
+            <a href="/getCart" class="cart-link" aria-label="Ver carrito"
+              ><svg class="icon" aria-hidden="true">
+                <use href="/brand/icons.svg#bag"></use></svg
+              ><span
+                class="cart-count"
+                th:text="${session.cart == null ? 0 : #lists.size(session.cart)}"
+                >0</span
+              ></a
+            >
+          </div>
+        </nav>
+      </div>
+    </header>
+    <aside th:fragment="sidebar" class="sidebar">
+      <div class="sidebar-title">Administración</div>
+      <nav aria-label="Administración">
+        <a
+          th:classappend="${appPath == '/administrador'} ? 'active'"
+          href="/administrador"
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#grid"></use></svg
+          >Vista general</a
+        ><a
+          th:classappend="${appPath == '/productos'} ? 'active'"
+          href="/productos"
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#box"></use></svg
+          >Productos</a
+        ><a
+          th:classappend="${appPath == '/administrador/usuarios'} ? 'active'"
+          href="/administrador/usuarios"
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#user"></use></svg
+          >Usuarios</a
+        ><a
+          th:classappend="${appPath == '/administrador/ordenes'} ? 'active'"
+          href="/administrador/ordenes"
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#receipt"></use></svg
+          >Órdenes</a
+        >
+      </nav>
+      <a class="sidebar-store" href="/"
+        ><svg class="icon" aria-hidden="true">
+          <use href="/brand/icons.svg#store"></use></svg
+        >Ver tienda</a
+      >
+      <div class="sidebar-note">
+        <img src="/brand/mark.svg" width="32" height="32" alt="" />
+        <p>Todo conectado.<br /><span>Tu negocio, en un lugar.</span></p>
+      </div>
+    </aside>
+    <footer th:fragment="footer" class="footer">
+      <div class="container footer-main">
+        <div>
+          <a href="/"
+            ><img
+              class="logo"
+              src="/brand/techlink.svg"
+              alt="TechLink, inicio"
+              width="185"
+              height="40"
+          /></a>
+          <p>Tecnología que va contigo.</p>
+        </div>
+        <nav aria-label="Pie de página">
+          <a href="/#catalogo">Explorar catálogo</a
+          ><a href="/usuario/compras">Mis compras</a
+          ><a href="/usuario/login">Mi cuenta</a>
+        </nav>
+      </div>
+      <div class="container footer-bottom">
+        <span>© 2026 TechLink. Proyecto de Eduardo y Gianfranco.</span
+        ><span>Hecho para conectar.</span>
+      </div>
+    </footer>
+  </body>
+</html>

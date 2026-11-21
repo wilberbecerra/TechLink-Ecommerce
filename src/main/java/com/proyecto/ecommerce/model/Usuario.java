@@ -14,6 +14,7 @@ public class Usuario {
     private Integer id;
     private String nombre;
     private String username;
+    @Column(unique = true)
     private String email;
     private String direccion;
     private String telefono;
@@ -124,7 +125,6 @@ public class Usuario {
                 ", direccion='" + direccion + '\'' +
                 ", telefono='" + telefono + '\'' +
                 ", tipo='" + tipo + '\'' +
-                ", password='" + password + '\'' +
                 '}';
     }
 }

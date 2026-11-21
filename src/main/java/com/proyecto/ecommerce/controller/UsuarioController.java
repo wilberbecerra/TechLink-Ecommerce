@@ -1,112 +1,121 @@
 package com.proyecto.ecommerce.controller;
 
-import java.util.List;
-import java.util.Optional;
-
-import jakarta.servlet.http.HttpSession;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.proyecto.ecommerce.model.Usuario;
+import com.proyecto.ecommerce.service.*;
+import jakarta.servlet.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.proyecto.ecommerce.model.Orden;
-import com.proyecto.ecommerce.model.Usuario;
-import com.proyecto.ecommerce.service.IOrdenService;
-import com.proyecto.ecommerce.service.IUsuarioService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @RequestMapping("/usuario")
 public class UsuarioController {
 
-    private final Logger logger= LoggerFactory.getLogger(UsuarioController.class);
+  private final IUsuarioService usuarios;
+  private final IOrdenService ordenes;
+  private final BCryptPasswordEncoder encoder;
 
-    @Autowired
-    private IUsuarioService usuarioService;
+  public UsuarioController(
+    IUsuarioService u,
+    IOrdenService o,
+    BCryptPasswordEncoder e
+  ) {
+    usuarios = u;
+    ordenes = o;
+    encoder = e;
+  }
 
-    @Autowired
-    private IOrdenService ordenService;
+  @GetMapping("/registro")
+  public String register() {
+    return "usuario/registro";
+  }
 
-    BCryptPasswordEncoder passEncode= new BCryptPasswordEncoder();
+  @GetMapping("/login")
+  public String login() {
+    return "usuario/login";
+  }
 
-
-    // /usuario/registro
-    @GetMapping("/registro")
-    public String create() {
-        return "usuario/registro";
+  @PostMapping("/save")
+  public String save(
+    @RequestParam String nombre,
+    @RequestParam String email,
+    @RequestParam String direccion,
+    @RequestParam String password,
+    Model model
+  ) {
+    email = email.strip().toLowerCase(java.util.Locale.ROOT);
+    if (
+      nombre.isBlank() ||
+      !email.matches("[^@\\s]+@[^@\\s]+[.][^@\\s]+") ||
+      direccion.isBlank() ||
+      password.length() < 8 ||
+      usuarios.findByEmail(email).isPresent()
+    ) {
+      model.addAttribute(
+        "errorRegistro",
+        "Revisa tus datos. El correo debe ser único y la contraseña debe tener al menos 8 caracteres."
+      );
+      return "usuario/registro";
     }
+    usuarios.save(
+      new Usuario(
+        null,
+        nombre.strip(),
+        email,
+        email,
+        direccion.strip(),
+        null,
+        "USER",
+        encoder.encode(password)
+      )
+    );
+    return "redirect:/usuario/login?registered";
+  }
 
-    @PostMapping("/save")
-    public String save(Usuario usuario) {
-        logger.info("Usuario registro: {}", usuario);
-        usuario.setTipo("USER");
-        usuario.setPassword( passEncode.encode(usuario.getPassword()));
-        usuarioService.save(usuario);
-        return "redirect:/";
-    }
+  @GetMapping("/acceder")
+  public String access(Authentication a) {
+    return usuarios
+      .findByEmail(a.getName())
+      .map(u ->
+        "ADMIN".equals(u.getTipo()) ? "redirect:/administrador" : "redirect:/"
+      )
+      .orElse("redirect:/usuario/login");
+  }
 
-    @GetMapping("/login")
-    public String login() {
-        return "usuario/login";
-    }
+  @GetMapping("/compras")
+  public String purchases(Model m, Authentication a) {
+    m.addAttribute(
+      "ordenes",
+      ordenes.findByUsuario(usuarios.findByEmail(a.getName()).orElseThrow())
+    );
+    return "usuario/compras";
+  }
 
-    @GetMapping("/acceder")
-    public String acceder(Usuario usuario, HttpSession session) {
-        logger.info("Accesos : {}", usuario);
+  @GetMapping("/detalle/{id}")
+  public String detail(@PathVariable Integer id, Model m, Authentication a) {
+    var o = ordenes
+      .findById(id)
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    if (
+      !o.getUsuario().getEmail().equals(a.getName())
+    ) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    m.addAttribute("orden", o);
+    m.addAttribute("detalles", o.getDetalles());
+    return "usuario/detallecompra";
+  }
 
-        Optional<Usuario> user=usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString()));
-        //logger.info("Usuario de db: {}", user.get());
-
-        if (user.isPresent()) {
-            session.setAttribute("idusuario", user.get().getId());
-
-            if (user.get().getTipo().equals("ADMIN")) {
-                return "redirect:/administrador";
-            }else {
-                return "redirect:/";
-            }
-        }else {
-            logger.info("Usuario no existe");
-        }
-
-        return "redirect:/";
-    }
-
-    @GetMapping("/compras")
-    public String obtenerCompras(Model model, HttpSession session) {
-        model.addAttribute("sesion", session.getAttribute("idusuario"));
-
-        Usuario usuario= usuarioService.findById(  Integer.parseInt(session.getAttribute("idusuario").toString()) ).get();
-        List<Orden> ordenes= ordenService.findByUsuario(usuario);
-        logger.info("ordenes {}", ordenes);
-
-        model.addAttribute("ordenes", ordenes);
-
-        return "usuario/compras";
-    }
-
-    @GetMapping("/detalle/{id}")
-    public String detalleCompra(@PathVariable Integer id, HttpSession session, Model model) {
-        logger.info("Id de la orden: {}", id);
-        Optional<Orden> orden=ordenService.findById(id);
-
-        model.addAttribute("detalles", orden.get().getDetalles());
-
-
-        //session
-        model.addAttribute("sesion", session.getAttribute("idusuario"));
-        return "usuario/detallecompra";
-    }
-
-    @GetMapping("/cerrar")
-    public String cerrarSesion( HttpSession session ) {
-        session.removeAttribute("idusuario");
-        return "redirect:/";
-    }
+  @PostMapping("/cerrar")
+  public String logout(
+    HttpServletRequest req,
+    HttpServletResponse res,
+    Authentication a
+  ) {
+    new SecurityContextLogoutHandler().logout(req, res, a);
+    return "redirect:/usuario/login?logout";
+  }
 }

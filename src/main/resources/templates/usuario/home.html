@@ -1,74 +1,187 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>TechLink</title>
-
-
-    <!-- Bootstrap core CSS -->
-    <link th:href="@{vendor/bootstrap/css/bootstrap.min.css}"
-          rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link th:href="@{css/heroic-features.css}" rel="stylesheet">
-
-</head>
-
-<body>
-
-<!-- Navigation -->
-<div th:include="usuario/template_usuario.html::header" th:if="${sesion==null}">
-</div>
-
-<div th:include="usuario/template_usuario.html::header-user" th:unless="${sesion==null}"> </div>
-
-<!-- Page Content -->
-<div class="container">
-
-    <!-- Jumbotron Header -->
-    <header class="jumbotron my-4" >
-        <h1 class="display-3">Bienvenido a TechLink</h1>
-        <p class="lead">Tu zona tecnológica favorita</p>
-    </header>
-
-    <!-- Page Features -->
-    <div class="row text-center">
-
-        <div class="col-lg-3 col-md-6 mb-4" th:each="producto: ${productos}">
-            <div class="card h-100">
-                <img class="card-img-top"
-                     th:src="@{/images/{img} (img=${producto.imagen})} " alt="">
-                <div class="card-body">
-                    <p class="card-text" th:text="${producto.nombre}"></p>
-                </div>
-                <div class="card-footer">
-                    <a th:href="@{/productohome/{id}  (id=${producto.id})  }" class="btn btn-success">Ver
-                        producto</a>
-                </div>
-            </div>
+  <head th:replace="~{fragments/layout :: head('Tu zona tecnológica')}"></head>
+  <body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <main id="contenido" class="container page">
+      <section
+        class="hero"
+        th:if="${#strings.isEmpty(nombre) && #strings.isEmpty(categoria) && destacado != null}"
+      >
+        <div class="hero-copy">
+          <span class="hero-intro">Encuentra eso que te mueve</span>
+          <h1>Conecta con tu<br />siguiente nivel.</h1>
+          <p>
+            Para jugar, crear o desconectar.<br />Tu próximo upgrade empieza en
+            TechLink.
+          </p>
+          <a class="button" href="#catalogo">Explorar productos</a>
+          <div class="hero-note">Tu setup. Tu música. Tu mundo.</div>
         </div>
-
-    </div>
-    <!-- /.row -->
-
-</div>
-<!-- /.container -->
-
-<!-- Footer -->
-<div th:include="usuario/template_usuario.html::footer">
-</div>
-
-<!-- Bootstrap core JavaScript -->
-<script th:src="@{vendor/jquery/jquery.min.js}"></script>
-<script th:src="@{vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
-
-</body>
-
+        <a
+          class="hero-stage"
+          th:href="@{/productohome/{id}(id=${destacado.id})}"
+          ><span class="feature-tag">El sonido de tu espacio</span
+          ><img
+            th:src="@{/images/{img}(img=${destacado.imagen})}"
+            th:alt="${destacado.nombre}"
+            fetchpriority="high"
+            width="450"
+            height="430"
+          />
+          <div class="hero-caption">
+            <span
+              ><strong th:text="${destacado.nombre}">Sony WH-1000XM5</strong
+              ><span>Conoce todos los detalles</span></span
+            ><strong
+              ><span
+                th:text="${'S/ ' + #numbers.formatDecimal(destacado.precio, 1, 'COMMA', 2, 'POINT')}"
+                >S/ 0.00</span
+              ></strong
+            >
+          </div></a
+        >
+      </section>
+      <nav class="category-grid" aria-label="Categorías">
+        <a class="category-tile" href="/?categoria=Computación#catalogo"
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#laptop"></use></svg
+          ><span>Computación</span
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#chevron"></use></svg></a
+        ><a class="category-tile" href="/?categoria=Audio#catalogo"
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#audio"></use></svg
+          ><span>Audio</span
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#chevron"></use></svg></a
+        ><a class="category-tile" href="/?categoria=Gaming#catalogo"
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#game"></use></svg
+          ><span>Gaming</span
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#chevron"></use></svg></a
+        ><a class="category-tile" href="/?categoria=Hogar y oficina#catalogo"
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#home"></use></svg
+          ><span>Hogar y oficina</span
+          ><svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#chevron"></use></svg
+        ></a>
+      </nav>
+      <section id="catalogo" class="catalog-section">
+        <div class="section-heading">
+          <div>
+            <h2
+              th:text="${#strings.isEmpty(nombre) ? 'Tu próximo upgrade está aquí.' : 'Resultados para “' + nombre + '”'}"
+            >
+              Tu próximo upgrade está aquí.
+            </h2>
+            <p>
+              <span th:text="${#lists.size(productos)}">12</span> productos para
+              tu día a día
+            </p>
+          </div>
+          <label class="sort-control"
+            >Ordenar por
+            <select id="sort">
+              <option value="default">Destacados</option>
+              <option value="price-asc">Menor precio</option>
+              <option value="price-desc">Mayor precio</option>
+              <option value="name">Nombre</option>
+            </select></label
+          >
+        </div>
+        <nav class="category-tabs" aria-label="Filtrar catálogo">
+          <a
+            href="/#catalogo"
+            th:classappend="${#strings.isEmpty(categoria)} ? 'active'"
+            >Todo el catálogo</a
+          ><a
+            th:href="@{/(categoria='Computación')} + '#catalogo'"
+            th:classappend="${categoria == 'Computación'} ? 'active'"
+            >Computación</a
+          ><a
+            th:href="@{/(categoria='Audio')} + '#catalogo'"
+            th:classappend="${categoria == 'Audio'} ? 'active'"
+            >Audio</a
+          ><a
+            th:href="@{/(categoria='Gaming')} + '#catalogo'"
+            th:classappend="${categoria == 'Gaming'} ? 'active'"
+            >Gaming</a
+          ><a
+            th:href="@{/(categoria='Hogar y oficina')} + '#catalogo'"
+            th:classappend="${categoria == 'Hogar y oficina'} ? 'active'"
+            >Hogar y oficina</a
+          >
+        </nav>
+        <div class="product-grid" id="product-grid">
+          <article
+            class="product-card"
+            th:each="p : ${productos}"
+            th:attr="data-price=${p.precio},data-name=${p.nombre}"
+          >
+            <a class="product-image" th:href="@{/productohome/{id}(id=${p.id})}"
+              ><img
+                loading="lazy"
+                th:src="@{/images/{img}(img=${p.imagen})}"
+                th:alt="${p.nombre}"
+                width="280"
+                height="230"
+            /></a>
+            <div class="product-info">
+              <span class="product-category" th:text="${p.categoria}"
+                >Audio</span
+              >
+              <h3>
+                <a
+                  th:href="@{/productohome/{id}(id=${p.id})}"
+                  th:text="${p.nombre}"
+                  >Producto</a
+                >
+              </h3>
+              <div class="product-bottom">
+                <strong class="price"
+                  ><span
+                    th:text="${'S/ ' + #numbers.formatDecimal(p.precio, 1, 'COMMA', 2, 'POINT')}"
+                    >S/ 0.00</span
+                  ></strong
+                ><a
+                  class="small-button"
+                  th:href="@{/productohome/{id}(id=${p.id})}"
+                  th:aria-label="${'Ver ' + p.nombre}"
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="/brand/icons.svg#eye"></use></svg
+                ></a>
+              </div>
+              <span
+                class="stock-text"
+                th:text="${p.cantidad > 0 ? 'Disponible' : 'Agotado'}"
+                >Disponible</span
+              >
+            </div>
+          </article>
+        </div>
+        <div class="empty-state" th:if="${#lists.isEmpty(productos)}">
+          <svg class="icon" aria-hidden="true">
+            <use href="/brand/icons.svg#search"></use>
+          </svg>
+          <h3>No encontramos productos</h3>
+          <p>Prueba con otro nombre o explora todas las categorías.</p>
+          <a class="button" href="/#catalogo">Ver catálogo</a>
+        </div>
+      </section>
+      <section class="closing-strip">
+        <h2>Arma un espacio que sea tuyo.</h2>
+        <p>
+          Del primer clic a tu próxima partida.<br />Encuentra las piezas de tu
+          setup en nuestro catálogo.
+        </p>
+        <a href="/?categoria=Gaming#catalogo" class="button secondary"
+          >Explorar gaming</a
+        >
+      </section>
+    </main>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+  </body>
 </html>
