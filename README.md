@@ -10,7 +10,6 @@
 </p>
 
 <p align="center">
-  <a href="#el-rediseño">Rediseño</a> ·
   <a href="#galería">Galería</a> ·
   <a href="#ejecución-local">Instalación</a> ·
   <a href="docs/capturas.md">Rutas de las vistas</a>
