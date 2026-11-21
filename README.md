@@ -24,9 +24,9 @@ TechLink conecta un catálogo de productos tecnológicos con el flujo completo d
 
 Desarrollado como proyecto académico, integra **Spring MVC, Thymeleaf, Spring Security, JPA y JasperReports**. La persistencia local utiliza **SQL Server**.
 
-## El rediseño
+## Experiencia de compra
 
-La renovación visual conserva las rutas del proyecto y unifica la experiencia de la tienda y la administración:
+La tienda y la administración comparten una identidad visual y una navegación coherente:
 
 - **Identidad propia:** logo vectorial con un símbolo de enlace, azul cobalto y superficies claras.
 - **Catálogo:** fotografías del proyecto, categorías, búsqueda, ordenamiento y disponibilidad.
@@ -34,38 +34,36 @@ La renovación visual conserva las rutas del proyecto y unifica la experiencia d
 - **Administración:** navegación común, indicadores del negocio, inventario con filtro y formularios de creación y edición.
 - **Diseño adaptable:** vistas revisadas en móvil, tablet y escritorio, con foco visible y controles etiquetados.
 
-También se separó el carrito por sesión, se protegieron las operaciones con CSRF y roles, y se incorporaron validaciones de stock y acceso a las órdenes.
+Cada sesión mantiene su propio carrito. Las operaciones están protegidas con CSRF y roles, con validaciones de stock y acceso a las órdenes.
 
 ## Galería
 
-Capturas del rediseño actual, tomadas de la aplicación ejecutada con datos de demostración. Haz clic para verlas completas.
+Capturas de TechLink en ejecución con datos de demostración. Haz clic para verlas completas.
 
 | Tienda | Administración |
 | --- | --- |
-| [![Tienda TechLink](recursos/redesign/tienda-desktop.png)](recursos/redesign/tienda-desktop.png) | [![Panel de administración](recursos/redesign/admin-desktop.png)](recursos/redesign/admin-desktop.png) |
+| [![Tienda TechLink](recursos/tienda-desktop.png)](recursos/tienda-desktop.png) | [![Panel de administración](recursos/admin-desktop.png)](recursos/admin-desktop.png) |
 
 | Inicio de sesión | Versión móvil |
 | --- | --- |
-| [![Acceso a TechLink](recursos/redesign/login-desktop.png)](recursos/redesign/login-desktop.png) | [Vista completa de la tienda en móvil](recursos/redesign/tienda-movil.png) |
+| [![Acceso a TechLink](recursos/login-desktop.png)](recursos/login-desktop.png) | [Vista completa de la tienda en móvil](recursos/tienda-movil.png) |
 
 <details>
 <summary>Ver productos, usuarios y órdenes</summary>
 
 | Inventario | Crear producto |
 | --- | --- |
-| [![Inventario actual](recursos/redesign/productos-desktop.png)](recursos/redesign/productos-desktop.png) | [![Crear producto](recursos/redesign/crear-producto-desktop.png)](recursos/redesign/crear-producto-desktop.png) |
+| [![Inventario actual](recursos/productos-desktop.png)](recursos/productos-desktop.png) | [![Crear producto](recursos/crear-producto-desktop.png)](recursos/crear-producto-desktop.png) |
 
 | Editar producto | Usuarios |
 | --- | --- |
-| [![Editar producto](recursos/redesign/editar-producto-desktop.png)](recursos/redesign/editar-producto-desktop.png) | [![Usuarios](recursos/redesign/usuarios-desktop.png)](recursos/redesign/usuarios-desktop.png) |
+| [![Editar producto](recursos/editar-producto-desktop.png)](recursos/editar-producto-desktop.png) | [![Usuarios](recursos/usuarios-desktop.png)](recursos/usuarios-desktop.png) |
 
 | Órdenes | Detalle de orden |
 | --- | --- |
-| [![Órdenes](recursos/redesign/ordenes-desktop.png)](recursos/redesign/ordenes-desktop.png) | [![Detalle de orden](recursos/redesign/detalle-orden-desktop.png)](recursos/redesign/detalle-orden-desktop.png) |
+| [![Órdenes](recursos/ordenes-desktop.png)](recursos/ordenes-desktop.png) | [![Detalle de orden](recursos/detalle-orden-desktop.png)](recursos/detalle-orden-desktop.png) |
 
 </details>
-
-Todas las imágenes publicadas en esta galería pertenecen al rediseño y están en `recursos/redesign/`.
 
 ## Funcionalidades
 
@@ -161,7 +159,7 @@ src/main/resources/
 ├── static/         # Logo, iconos, estilos y JavaScript
 └── reports/        # Plantilla del comprobante PDF
 images/             # Fotografías del catálogo
-recursos/redesign/  # Capturas del rediseño
+recursos/           # Capturas de la aplicación
 scripts/            # Preparación de SQL Server y arranque local
 ```
 
@@ -174,7 +172,7 @@ scripts/            # Preparación de SQL Server y arranque local
 
 Las pruebas utilizan una base H2 temporal en modo SQL Server y credenciales exclusivas de prueba; no alteran la base local. Cubren autenticación, roles, vistas, registro, CSRF, aislamiento del carrito, cantidades, stock, órdenes, privacidad, PDF y CRUD de productos.
 
-El rediseño se comprobó con **9 pruebas automatizadas** y **45 comprobaciones en Chrome**, incluyendo vistas a 375, 768 y 1440 px. Las comprobaciones cubren esas vistas y flujos; no equivalen a una auditoría completa de accesibilidad ni a pruebas en todos los navegadores.
+La aplicación se comprobó con **9 pruebas automatizadas** y **45 comprobaciones en Chrome**, incluyendo vistas a 375, 768 y 1440 px. Las comprobaciones cubren esas vistas y flujos; no equivalen a una auditoría completa de accesibilidad ni a pruebas en todos los navegadores.
 
 ## Identidad visual
 
