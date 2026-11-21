@@ -45,3 +45,9 @@ images/upload-*
 *.pem
 *.key
 *.bak
+
+# Keep working documentation and agent skills local.
+/docs/
+/skills/
+*.md
+!/README.md

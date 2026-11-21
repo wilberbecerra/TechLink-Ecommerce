@@ -16,8 +16,7 @@
 <p align="center">
   <a href="#el-rediseño">Rediseño</a> ·
   <a href="#galería">Galería</a> ·
-  <a href="#ejecución-local">Instalación</a> ·
-  <a href="docs/capturas.md">Rutas de las vistas</a>
+  <a href="#ejecución-local">Instalación</a>
 </p>
 
 ## El proyecto
@@ -67,7 +66,7 @@ Capturas del rediseño actual, tomadas de la aplicación ejecutada con datos de 
 
 </details>
 
-La [guía de capturas](docs/capturas.md) reúne los enlaces de cada pantalla, los roles necesarios y la preparación del carrito y las órdenes. Todas las imágenes publicadas en esta galería pertenecen al rediseño y están en `recursos/redesign/`.
+Todas las imágenes publicadas en esta galería pertenecen al rediseño y están en `recursos/redesign/`.
 
 ## Funcionalidades
 
@@ -165,8 +164,6 @@ src/main/resources/
 images/             # Fotografías del catálogo
 recursos/redesign/  # Capturas del rediseño
 scripts/            # Preparación de SQL Server y arranque local
-docs/               # Diseño, capturas y validación
-skills/             # Skill reutilizable para continuar el diseño
 ```
 
 ## Pruebas y validación
@@ -178,14 +175,12 @@ skills/             # Skill reutilizable para continuar el diseño
 
 Las pruebas utilizan una base H2 temporal en modo SQL Server y credenciales exclusivas de prueba; no alteran la base local. Cubren autenticación, roles, vistas, registro, CSRF, aislamiento del carrito, cantidades, stock, órdenes, privacidad, PDF y CRUD de productos.
 
-El rediseño se comprobó con **9 pruebas automatizadas** y **45 comprobaciones en Chrome**, incluyendo vistas a 375, 768 y 1440 px. El detalle y sus límites están en [Validación](docs/validacion.md).
+El rediseño se comprobó con **9 pruebas automatizadas** y **45 comprobaciones en Chrome**, incluyendo vistas a 375, 768 y 1440 px. Las comprobaciones cubren esas vistas y flujos; no equivalen a una auditoría completa de accesibilidad ni a pruebas en todos los navegadores.
 
-## Diseño y documentación
+## Identidad visual
 
-- [Identidad visual y decisiones de interfaz](docs/design.md).
-- [Rutas y preparación de capturas](docs/capturas.md).
 - [Logo SVG editable](src/main/resources/static/brand/techlink.svg), [versión con letras blancas](src/main/resources/static/brand/techlink-white.svg) y [símbolo independiente](src/main/resources/static/brand/mark.svg).
-- [Skill TechLink Design](skills/techlink-design/SKILL.md), adaptada de [Hallmark](https://github.com/Nutlope/hallmark), con su licencia MIT conservada.
+- La dirección visual toma como referencia los principios de [Hallmark](https://github.com/Nutlope/hallmark).
 
 ## Alcance académico
 
